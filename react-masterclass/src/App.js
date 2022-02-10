@@ -2,16 +2,25 @@ import styled, { keyframes } from "styled-components";
 
 const Wrapper = styled.div`
   display: flex;
+  height: 100vh;
+  width: 100vw;
+  justify-content: center;
+  align-items: center;
+  background-color: ${(props) => props.theme.backgroundColor};
+  text-color: ${(props) => props.theme.textColor};
 `;
 
 const animation = keyframes`
 from{
   transform:rotate(0deg);
-  border-radius:10px;
+  border-radius:30px;
+}
+50%{
+  border-radius:100px;
 }
 to{
   transform:rotate(360deg);
-  border-radius:100px;
+  border-radius:30px;
 }`;
 
 const Box = styled.div`
@@ -35,6 +44,7 @@ const Box = styled.div`
 function App() {
   return (
     <Wrapper>
+      <span>Hihi</span>
       <Box>
         <span>asdf</span>
       </Box>
