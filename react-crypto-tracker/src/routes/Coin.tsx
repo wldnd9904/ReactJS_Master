@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import {useParams} from "react-router";
-import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Chart from "../routes/Chart";
 import Price from "../routes/Price";
@@ -8,11 +7,18 @@ import {Routes, Route, useMatch } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "./api";
+import {Helmet} from "react-helmet";
 
 const Container = styled.div`
     padding: 0px 20px;
     max-width:480px;
     margin:0 auto;
+    position:relative;
+`;
+const Left = styled.span`
+position:absolute;
+left:0px;
+padding:0px 20px;
 `;
 const Header = styled.header`
     height:10vh;
@@ -135,24 +141,20 @@ function Coin(){
   const priceMatch = useMatch("/:coinId/price");
   const chartMatch = useMatch("/:coinId/chart");
   const {isLoading: infoLoading, data: infoData} = useQuery<IInfo>(["info",coinId], () => fetchCoinInfo(coinId));
-  const {isLoading: tickersLoading, data: tickersData} = useQuery<IPrice>(["tickers",coinId], () => fetchCoinTickers(coinId));
-  //const [loading,setLoading] = useState<boolean>(true);
-  //const [priceInfo, setPriceInfo] = useState<IPrice>();
-  //const [info, setInfo] = useState<IInfo>();
-  //  useEffect(()=>{
-  //      (async () => {
-  //          const infoData = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
-  //          const priceData = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json();
-  //          setInfo(infoData);
-  //          setPriceInfo(priceData);
-  //          setLoading(false);
-  //      })();
-  //  },[coinId]);
+  const {isLoading: tickersLoading, data: tickersData} = useQuery<IPrice>(["tickers",coinId,], () => fetchCoinTickers(coinId),{refetchInterval:5000});
   const loading = infoLoading || tickersLoading;
     return (
      <Container>
-        <Header>
-            <Title>{state?.name? state.name: loading? "Loading..." : infoData?.name}</Title>
+      <Helmet>
+        <title>{state?.name? state.name: loading? "Loading..." : infoData?.name}</title>
+      </Helmet>
+      <Header>
+         <Title>
+          <Left>
+               <Link to={`/`}>{`<`}</Link>
+          </Left>
+          {state?.name? state.name: loading? "Loading..." : infoData?.name}
+         </Title>
         </Header>
         {loading ? (
          <Loader>Loading...</Loader>
@@ -168,8 +170,8 @@ function Coin(){
                <span>${infoData?.symbol}</span>
              </OverviewItem>
              <OverviewItem>
-               <span>Open Source:</span>
-               <span>{infoData?.open_source ? "Yes" : "No"}</span>
+               <span>Price:</span>
+               <span>{tickersData?.quotes.USD.price.toFixed(3)}</span>
              </OverviewItem>
            </Overview>
            <Description>{infoData?.description}</Description>
@@ -192,8 +194,8 @@ function Coin(){
              </Tab>
            </Tabs>
            <Routes>
-             <Route path={`/${coinId}/price`} element={<Price />} />
-             <Route path={`/${coinId}/chart`} element={<Chart />} />
+             <Route path={`/price`} element={<Price/>} />
+             <Route path={`/chart`} element={<Chart coinId={coinId as string}/>} />
            </Routes>
          </>
        )}
