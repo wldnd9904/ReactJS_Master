@@ -138,8 +138,8 @@ function Coin(){
   const {coinId} = useParams();
   const location = useLocation();
   const state = location.state as RouteState;
-  const priceMatch = useMatch("/:coinId/price");
-  const chartMatch = useMatch("/:coinId/chart");
+  const priceMatch = useMatch(`${process.env.PUBLIC_URL}/:coinId/price`);
+  const chartMatch = useMatch(`${process.env.PUBLIC_URL}/:coinId/chart`);
   const {isLoading: infoLoading, data: infoData} = useQuery<IInfo>(["info",coinId], () => fetchCoinInfo(coinId));
   const {isLoading: tickersLoading, data: tickersData} = useQuery<IPrice>(["tickers",coinId,], () => fetchCoinTickers(coinId),{refetchInterval:5000});
   const loading = infoLoading || tickersLoading;
@@ -187,15 +187,15 @@ function Coin(){
            </Overview>
            <Tabs>
              <Tab isActive={chartMatch !== null}>
-               <Link to={`/${coinId}/chart`}>Chart</Link>
+               <Link to={`chart`}>Chart</Link>
              </Tab>
              <Tab isActive={priceMatch !== null}>
-               <Link to={`/${coinId}/price`}>Price</Link>
+               <Link to={`price`}>Price</Link>
              </Tab>
            </Tabs>
            <Routes>
-             <Route path={`/price`} element={<Price/>} />
-             <Route path={`/chart`} element={<Chart coinId={coinId as string}/>} />
+             <Route path={`price`} element={<Price/>} />
+             <Route path={`chart`} element={<Chart coinId={coinId as string}/>} />
            </Routes>
          </>
        )}
